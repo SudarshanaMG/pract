@@ -5,6 +5,7 @@ import Post from './pages/Post'
 import NotFound from './pages/NotFound'
 import { Routes, Route, NavLink } from 'react-router-dom'
 import NewPost from './pages/NewPost'
+import EditPost from './pages/EditPost'
 import './index.css'
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/new" element={<NewPost />} />
           <Route path="posts/:id" element={<Post />} />
+          <Route path='posts/:id/edit' element={<EditPost />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
