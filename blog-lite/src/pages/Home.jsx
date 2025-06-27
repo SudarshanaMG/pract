@@ -34,6 +34,11 @@ export default function Home() {
     // }, [page]);
 
   useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(timeout);
+  }, [searchTerm]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if(entries[0].isIntersecting && hasNextPage && !isFetchingNextPage){
