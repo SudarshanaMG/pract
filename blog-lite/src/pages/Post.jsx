@@ -1,30 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { usePost } from "../hooks/usePost";
+import { useComment } from "../hooks/useComment";
+import { useDeletePost } from "../hooks/useDeletePost";
+
 
 export default function Post() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
     const {
         data:post,
         isLoading,
         isError,
-    } = useQuery({
-        queryKey: ['post', id], 
-        queryFn: () => 
-        fetch(`https://jsonplaceholder.typicode.com/posts/${id}`).then((res) => res.json())
-    });
+    } = usePost(id);
 
-    const deleteMutation = useMutation({
-      mutationFn: async () => {
-        await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-        method: "DELETE",});
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["posts"] });
-        navigate('/');
-      },
-    });
+        const {
+        data:comments,
+        isLoading: commentsLoading,
+        isError: commentsError,
+    } = useComment(id);
+
+    const deleteMutation = useDeletePost(id, () => navigate("/"));
 
   if (isLoading) return <p className="text-gray-600">Loading post…</p>;
   if (isError) return <p className="text-red-500">Could not load post.</p>;
@@ -38,7 +34,7 @@ export default function Post() {
     //   <Link to="/" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">← Back to Home</Link>
     // </article>
     
-      
+      <>
     <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
         <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{post.title}</h5>
         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{post.body}</p>
@@ -56,6 +52,23 @@ export default function Post() {
         </div>
     </div>
 
+          <section className="mt-10">
+        <h3 className="text-xl font-semibold mb-4">💬 Comments</h3>
+
+        {commentsLoading && <p className="text-gray-500">Loading comments…</p>}
+        {commentsError && <p className="text-red-500">Failed to load comments.</p>}
+
+        <ul className="space-y-4">
+          {comments?.map((comment) => (
+            <li key={comment.id} className="border border-gray-200 dark:border-gray-700 p-4 rounded">
+              <h4 className="font-bold text-gray-800 dark:text-white">{comment.name}</h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{comment.email}</p>
+              <p className="mt-2 text-gray-700 dark:text-gray-200">{comment.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+</>
 
   );
 }

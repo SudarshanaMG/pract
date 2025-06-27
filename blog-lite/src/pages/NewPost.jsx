@@ -1,27 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCreatePost } from "../hooks/useCreatePost";
 
 export default function NewPost() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
 
- const mutation = useMutation({
-    mutationFn: async (newPost) => {
-      const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newPost),
-      });
-      return res.json();
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      navigate(`/posts/${data.id}`);
-    },
-  });
+ const mutation = useCreatePost((data) => navigate(`/posts/${data.id}`));
 
   const handleSubmit = (e) => {
     e.preventDefault();
